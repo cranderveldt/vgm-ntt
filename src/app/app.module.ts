@@ -9,11 +9,17 @@ import { AngularFireAuthModule } from '@angular/fire/auth';
 import { environment } from '../environments/environment';
 import { HomeComponent } from './pages/home/home.component';
 import { NbSidebarModule, NbLayoutModule, NbThemeModule, DEFAULT_THEME, NbButtonModule } from '@nebular/theme';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { NbEvaIconsModule } from '@nebular/eva-icons';
+import { RoomsComponent } from './pages/rooms/rooms.component';
+import { AddSongComponent } from './pages/add-song/add-song.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    HomeComponent
+    HomeComponent,
+    RoomsComponent,
+    AddSongComponent
   ],
   imports: [
     BrowserModule,
@@ -24,8 +30,11 @@ import { NbSidebarModule, NbLayoutModule, NbThemeModule, DEFAULT_THEME, NbButton
     NbLayoutModule,
     NbButtonModule,
     NbSidebarModule.forRoot(),
+    BrowserAnimationsModule,
+    NbThemeModule.forRoot({ name: 'default' }),
+    NbEvaIconsModule,
   ],
-  providers: [...NbThemeModule.forRoot({ name: 'default' }, [ DEFAULT_THEME ]).providers],
+  providers: [],
   bootstrap: [AppComponent],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA ]
 })
