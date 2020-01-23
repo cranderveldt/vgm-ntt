@@ -8,11 +8,13 @@ import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { AngularFireAuthModule } from '@angular/fire/auth';
 import { environment } from '../environments/environment';
 import { HomeComponent } from './pages/home/home.component';
-import { NbSidebarModule, NbLayoutModule, NbThemeModule, DEFAULT_THEME, NbButtonModule } from '@nebular/theme';
+import { NbSidebarModule, NbLayoutModule, NbThemeModule, NbButtonModule, NbListModule, NbCardModule, NbInputModule } from '@nebular/theme';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NbEvaIconsModule } from '@nebular/eva-icons';
 import { RoomsComponent } from './pages/rooms/rooms.component';
 import { AddSongComponent } from './pages/add-song/add-song.component';
+import { NgxYoutubePlayerModule } from 'ngx-youtube-player';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -23,16 +25,21 @@ import { AddSongComponent } from './pages/add-song/add-song.component';
   ],
   imports: [
     BrowserModule,
+    ReactiveFormsModule,
     AppRoutingModule,
     AngularFireModule.initializeApp(environment.firebase),
     AngularFirestoreModule,
     AngularFireAuthModule,
     NbLayoutModule,
     NbButtonModule,
+    NbListModule,
+    NbCardModule,
+    NbInputModule,
     NbSidebarModule.forRoot(),
     BrowserAnimationsModule,
     NbThemeModule.forRoot({ name: 'default' }),
     NbEvaIconsModule,
+    NgxYoutubePlayerModule.forRoot(),
   ],
   providers: [],
   bootstrap: [AppComponent],

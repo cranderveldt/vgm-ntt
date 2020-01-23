@@ -1,1 +1,25 @@
-<p>add-song works!</p>
+<nb-card>
+  <nb-card-body>
+    <h2>Add new song</h2>
+    <form [formGroup]="songForm" (ngSubmit)="addSong(songForm.value)">
+      <input type="text" formControlName="game" nbInput placeholder="Game">
+      <input type="text" formControlName="platform" nbInput placeholder="Platform">
+      <input type="text" formControlName="src" nbInput placeholder="YouTube ID" maxlength="11">
+      <div>
+        <button nbButton type="submit">Add Song</button>
+      </div>
+    </form>
+    
+    <h2>All added songs</h2>
+    <nb-list>
+      <nb-list-item *ngFor="let song of songs$ | async">
+        <div>{{ song.game }} for {{ song.platform }}</div>
+        <div class="intrinsic">
+          <youtube-player
+            [videoId]="song.src"
+          ></youtube-player>
+        </div>
+      </nb-list-item>
+    </nb-list>
+  </nb-card-body>
+</nb-card>
