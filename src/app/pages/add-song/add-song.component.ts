@@ -32,4 +32,8 @@ export class AddSongComponent implements OnInit {
     this.songForm.reset()
   }
 
+  platform(song) {
+    return song.platform.split(',').join(', ')
+  }
+
 }

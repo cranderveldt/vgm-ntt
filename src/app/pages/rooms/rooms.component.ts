@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { AngularFirestore } from '@angular/fire/firestore';
 
 @Component({
   selector: 'app-rooms',
@@ -6,8 +7,13 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./rooms.component.scss']
 })
 export class RoomsComponent implements OnInit {
+  rooms$: any
 
-  constructor() { }
+  constructor(
+    private db: AngularFirestore,
+  ) {
+    this.rooms$ = this.db.collection('rooms').valueChanges()
+  }
 
   ngOnInit() {
   }

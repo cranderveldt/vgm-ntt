@@ -1,10 +1,18 @@
 <nb-card>
   <nb-card-body>
     <h2>Add new song</h2>
-    <form [formGroup]="songForm" (ngSubmit)="addSong(songForm.value)">
-      <input type="text" formControlName="game" nbInput placeholder="Game">
-      <input type="text" formControlName="platform" nbInput placeholder="Platform">
-      <input type="text" formControlName="src" nbInput placeholder="YouTube ID" maxlength="11">
+    <form [formGroup]="songForm" class="bm-64" (ngSubmit)="addSong(songForm.value)">
+      <div class="flex-row-tablet flex-gutters-8 bm-16">
+        <div class="flex-col bm-16">
+          <input type="text" formControlName="game" nbInput placeholder="Game">
+        </div>
+        <div class="flex-col bm-16">
+          <input type="text" formControlName="platform" nbInput placeholder="Platform">
+        </div>
+        <div class="flex-col bm-16">
+          <input type="text" formControlName="src" nbInput placeholder="YouTube ID" maxlength="11">
+        </div>
+      </div>
       <div>
         <button nbButton type="submit">Add Song</button>
       </div>
@@ -13,12 +21,7 @@
     <h2>All added songs</h2>
     <nb-list>
       <nb-list-item *ngFor="let song of songs$ | async">
-        <div>{{ song.game }} for {{ song.platform }}</div>
-        <div class="intrinsic">
-          <youtube-player
-            [videoId]="song.src"
-          ></youtube-player>
-        </div>
+        {{ song.game }} for {{ platform(song) }}
       </nb-list-item>
     </nb-list>
   </nb-card-body>

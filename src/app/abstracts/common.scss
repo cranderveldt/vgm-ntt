@@ -1,0 +1,52 @@
+.intrinsic {
+  @include intrinsic-ratio('iframe');
+}
+
+@each $schar, $space in (p: padding, m: margin) {
+  @each $number in (4, 8, 12, 16, 24, 32, 48, 64, 128) {
+    @each $dchar, $dir in (t: top, r: right, l: left, b: bottom) {
+      .#{$dchar}#{$schar}-#{$number} {
+        #{$space}-#{$dir}: #{$number}px;
+      }
+    }
+    .v#{$schar}-#{$number} {
+      #{$space}-top: #{$number}px;
+      #{$space}-bottom: #{$number}px;
+    }
+    .h#{$schar}-#{$number} {
+      #{$space}-left: #{$number}px;
+      #{$space}-right: #{$number}px;
+    }
+    .f#{$schar}-#{$number} {
+      #{$space}: #{$number}px;
+    }
+  }
+}
+
+.flex-row-all {
+  @include flex-row-at(0);
+}
+
+.flex-row-mobile {
+  @include flex-row-at($mobile);
+}
+
+.flex-row-tablet {
+  @include flex-row-at($tablet);
+}
+
+.flex-gutters-4 {
+  @include flex-gutters(4);
+}
+
+.flex-gutters-8 {
+  @include flex-gutters(8);
+}
+
+.flex-justify-spaced {
+  justify-content: space-between;
+}
+
+.flex-align-center {
+  align-items: center;
+}

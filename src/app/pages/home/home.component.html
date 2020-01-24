@@ -1,6 +1,14 @@
-<p>Welcome to Video Game Name That Tune, a web game where you listen to a song and try to name what game it came from.</p>
-
-<div>
-  <a routerLink="/rooms" nbButton>Play the Game</a>
-  <a routerLink="/add-song" nbButton>Add Music to the Library</a>
-</div>
+<nb-card>
+  <nb-card-body>
+    <h6>Welcome to Video Game Name That Tune, a web game where you listen to a song and try to name what game it came from.</h6>
+    
+    <div class="flex-row-all flex-gutters-8">
+      <div class="flex-col">
+        <button routerLink="/rooms" nbButton>Play the Game</button>
+      </div>
+      <div class="flex-col">
+        <button routerLink="/add-song" nbButton>Add Music to the Library</button>
+      </div>
+    </div>
+  </nb-card-body>
+</nb-card>

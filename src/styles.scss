@@ -1,3 +1,6 @@
+@import './app/abstracts/variables.scss';
+@import './app/abstracts/mixins.scss';
+
 @import 'themes';
 
 @import '~@nebular/theme/styles/globals';
@@ -6,20 +9,4 @@
   @include nb-theme-global();
 };
 
-// Find ratio with (height / width * 100)%
-@mixin intrinsic-ratio($selector: '.scalable', $ratio: 56.25%) {
-  position: relative;
-  padding-bottom: $ratio;
-  height: 0px;
-  width: 100%;
-  #{$selector} {
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    width: 100%;
-    height: 100%;
-  }
-}
-.intrinsic {
-  @include intrinsic-ratio('iframe');
-}
+@import './app/abstracts/common.scss';

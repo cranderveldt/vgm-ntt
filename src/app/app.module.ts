@@ -8,7 +8,7 @@ import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { AngularFireAuthModule } from '@angular/fire/auth';
 import { environment } from '../environments/environment';
 import { HomeComponent } from './pages/home/home.component';
-import { NbSidebarModule, NbLayoutModule, NbThemeModule, NbButtonModule, NbListModule, NbCardModule, NbInputModule } from '@nebular/theme';
+import { NbLayoutModule, NbThemeModule, NbButtonModule, NbListModule, NbCardModule, NbInputModule, NbActionsModule } from '@nebular/theme';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NbEvaIconsModule } from '@nebular/eva-icons';
 import { RoomsComponent } from './pages/rooms/rooms.component';
@@ -35,7 +35,7 @@ import { ReactiveFormsModule } from '@angular/forms';
     NbListModule,
     NbCardModule,
     NbInputModule,
-    NbSidebarModule.forRoot(),
+    NbActionsModule,
     BrowserAnimationsModule,
     NbThemeModule.forRoot({ name: 'default' }),
     NbEvaIconsModule,

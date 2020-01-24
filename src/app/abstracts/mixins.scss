@@ -1,0 +1,228 @@
+// Find ratio with (height / width * 100)%
+@mixin intrinsic-ratio($selector: '.scalable', $ratio: 56.25%) {
+  position: relative;
+  padding-bottom: $ratio;
+  height: 0px;
+  width: 100%;
+  #{$selector} {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+$viewport-width: false !default;
+
+@mixin above-width($width: $mobile) {
+  @media screen and (min-width: $width + 1) {
+    @content;
+  }
+}
+
+@mixin below-width($width: $tablet) {
+  @media screen and (max-width: $width) {
+    @content;
+  }
+}
+
+@mixin flex-row() {
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+@mixin flex-row-at($width: 0) {
+  width: 100%;
+  @if $width == 0 {
+    display: flex;
+    & > .flex-col-1 {
+      width: 8.33333333333%;
+    }
+    & > .flex-col-2 {
+      width: 16.6666666667%;
+    }
+    & > .flex-col-3 {
+      width: 25%;
+    }
+    & > .flex-col-4 {
+      width: 33.3333333333%;
+    }
+    & > .flex-col-5 {
+      width: 41.6666666667%;
+    }
+    & > .flex-col-6 {
+      width: 50%;
+    }
+    & > .flex-col-7 {
+      width: 58.3333333333%;
+    }
+    & > .flex-col-8 {
+      width: 66.6666666667%;
+    }
+    & > .flex-col-9 {
+      width: 75%;
+    }
+    & > .flex-col-10 {
+      width: 83.3333333333%;
+    }
+    & > .flex-col-11 {
+      width: 91.6666666667%;
+    }
+    & > .flex-col-12 {
+      width: 100%;
+    }
+    & > .flex-percent-10 {
+      width: 10%;
+    }
+  } @else {
+    @include above-width($width) {
+      display: flex;
+      & > .flex-col-1 {
+        width: 8.33333333333%;
+      }
+      & > .flex-col-2 {
+        width: 16.6666666667%;
+      }
+      & > .flex-col-3 {
+        width: 25%;
+      }
+      & > .flex-col-4 {
+        width: 33.3333333333%;
+      }
+      & > .flex-col-5 {
+        width: 41.6666666667%;
+      }
+      & > .flex-col-6 {
+        width: 50%;
+      }
+      & > .flex-col-7 {
+        width: 58.3333333333%;
+      }
+      & > .flex-col-8 {
+        width: 66.6666666667%;
+      }
+      & > .flex-col-9 {
+        width: 75%;
+      }
+      & > .flex-col-10 {
+        width: 83.3333333333%;
+      }
+      & > .flex-col-11 {
+        width: 91.6666666667%;
+      }
+      & > .flex-col-12 {
+        width: 100%;
+      }
+      & > .flex-percent-10 {
+        width: 10%;
+      }
+    }
+  }
+}
+
+@mixin flex-column ($size, $width: 0) {
+  @if $width == 0 {
+    @if $size == auto {
+      width: auto;
+    }
+    @if $size == 1 {
+      width: 8.33333333333%;
+    }
+    @if $size == 2 {
+      width: 16.6666666667%;
+    }
+    @if $size == 3 {
+      width: 25%;
+    }
+    @if $size == 4 {
+      width: 33.3333333333%;
+    }
+    @if $size == 5 {
+      width: 41.6666666667%;
+    }
+    @if $size == 6 {
+      width: 50%;
+    }
+    @if $size == 7 {
+      width: 58.3333333333%;
+    }
+    @if $size == 8 {
+      width: 66.6666666667%;
+    }
+    @if $size == 9 {
+      width: 75%;
+    }
+    @if $size == 10 {
+      width: 83.3333333333%;
+    }
+    @if $size == 11 {
+      width: 91.6666666667%;
+    }
+    @if $size == 12 {
+      width: 100%;
+    }
+  } @else {
+    @include above-width($width) {
+      @if $size == auto {
+        width: auto;
+      }
+      @if $size == 1 {
+        width: 8.33333333333%;
+      }
+      @if $size == 2 {
+        width: 16.6666666667%;
+      }
+      @if $size == 3 {
+        width: 25%;
+      }
+      @if $size == 4 {
+        width: 33.3333333333%;
+      }
+      @if $size == 5 {
+        width: 41.6666666667%;
+      }
+      @if $size == 6 {
+        width: 50%;
+      }
+      @if $size == 7 {
+        width: 58.3333333333%;
+      }
+      @if $size == 8 {
+        width: 66.6666666667%;
+      }
+      @if $size == 9 {
+        width: 75%;
+      }
+      @if $size == 10 {
+        width: 83.3333333333%;
+      }
+      @if $size == 11 {
+        width: 91.6666666667%;
+      }
+      @if $size == 12 {
+        width: 100%;
+      }
+    }
+  }
+}
+
+@mixin flex-column-percent ($percent, $width) {
+  @if $width == 0 {
+    width: $percent;
+  } @else {
+    @include above-width($width) {
+      width: $percent;
+    }
+  }
+}
+
+@mixin flex-gutters ($width: 15, $selector: 'flex-col') {
+  margin-left: -$width + px;
+  margin-right: -$width + px;
+  & > [class*="#{$selector}"] {
+    padding-left: $width + px;
+    padding-right: $width + px;
+  }
+}
