@@ -12,7 +12,7 @@ export class RoomsComponent implements OnInit {
   constructor(
     private db: AngularFirestore,
   ) {
-    this.rooms$ = this.db.collection('rooms').valueChanges()
+    this.rooms$ = this.db.collection('rooms').valueChanges({ idField: 'id' })
   }
 
   ngOnInit() {

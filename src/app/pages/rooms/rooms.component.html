@@ -9,7 +9,7 @@
             {{ room.name }}
           </div>
           <div class="flex-col">
-            <button nbButton>Join</button>
+            <button nbButton [routerLink]="['/room', room.id]">Join</button>
           </div>
         </div>
       </nb-list-item>

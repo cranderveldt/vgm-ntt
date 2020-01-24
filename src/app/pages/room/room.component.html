@@ -1,0 +1,18 @@
+<nb-card *ngIf="room$ | async as room">
+  <nb-card-body>
+    <h3>{{ room.name }}</h3>
+    
+    <nb-list class="bm-32">
+      <nb-list-item *ngFor="let player of room.players$ | async">
+        <div class="flex-row-all flex-gutters-8">
+          <div class="flex-col">
+            {{ player.name }}
+          </div>
+          <div class="flex-col">
+            {{ player.score }}
+          </div>
+        </div>
+      </nb-list-item>
+    </nb-list>
+  </nb-card-body>
+</nb-card>

@@ -24,5 +24,12 @@
         {{ song.game }} for {{ platform(song) }}
       </nb-list-item>
     </nb-list>
+
+    <h2>List of all Games</h2>
+    <nb-list>
+      <nb-list-item *ngFor="let game of games$ | async">
+        {{ game }}
+      </nb-list-item>
+    </nb-list>
   </nb-card-body>
 </nb-card>

@@ -1,0 +1,20 @@
+<nb-card>
+  <nb-card-header>Join Room</nb-card-header>
+  <nb-card-body>
+    <form [formGroup]="gameForm" class="bm-64" (ngSubmit)="joinRoom(gameForm.value)">
+      <div class="flex-row-all flex-justify-spaced bm-8">
+        <span>Name</span>
+        <nb-icon icon="refresh" (click)="rename()"></nb-icon>
+      </div>
+      <div class="bm-16">
+        <input type="text" formControlName="name" nbInput placeholder="Name">
+      </div>
+      <div>
+        <button nbButton type="submit">Join Room</button>
+      </div>
+    </form>
+  </nb-card-body>
+  <nb-card-footer>
+    <button nbButton (click)="close()" status="basic">Leave Room</button>
+  </nb-card-footer>
+</nb-card>
