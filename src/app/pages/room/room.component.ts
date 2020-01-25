@@ -31,20 +31,17 @@ export class RoomComponent {
         this.userId = this.cookie.get(`${this.roomId}/playerId`)
         this.loadUser()
         this.roomRef = this.db.doc(`rooms/${this.roomId}`)
-        return this.roomRef.valueChanges().pipe(switchMap(room => {
-          return of({
+        return this.roomRef.valueChanges().pipe(switchMap(room => of({
             ...room,
             players$: this.roomRef.collection('players').valueChanges()
           })
-        }))
+        ))
       })
     )
   }
 
   loadUser() {
-    if (this.userId) {
-      console.log(this.userId)
-    } else {
+    if (!this.userId) {
       this.newUser()
     }
   }
@@ -53,6 +50,7 @@ export class RoomComponent {
     const ref = this.dialog.open(JoinRoomComponent, { context: {
       roomId: this.roomId,
     }})
+
     ref.onClose.pipe(take(1)).subscribe(async data => {
       if (data) {
         const userData = await this.roomRef.collection('players').add(data)

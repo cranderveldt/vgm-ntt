@@ -2,6 +2,7 @@
   <nb-card-body>
     <h3>{{ room.name }}</h3>
     
+    <h6>Players</h6>
     <nb-list class="bm-32">
       <nb-list-item *ngFor="let player of room.players$ | async">
         <div class="flex-row-all flex-gutters-8">
