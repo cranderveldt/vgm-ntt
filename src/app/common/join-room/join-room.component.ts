@@ -21,6 +21,7 @@ export class JoinRoomComponent {
     this.gameForm = this.formBuilder.group({
       name: this.randomName.randomName(),
       score: 0,
+      ready: false,
     })
   }
 
