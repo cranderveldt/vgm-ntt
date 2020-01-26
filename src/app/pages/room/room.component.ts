@@ -221,6 +221,8 @@ export class RoomComponent {
     this.winner = winner && winner.id === this.userId
     if (this.winner) {
       this.playerRef.update({ winner: true, score: firestore.FieldValue.increment(1), ready: false })
+    } else {
+      this.playerRef.update({ ready: false })
     }
 
   }

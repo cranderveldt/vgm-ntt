@@ -35,7 +35,7 @@
         <h4>Round Complete!</h4>
         <p>
           You guessed {{ guess }}, which is {{ correct ? 'correct!' : 'incorrect.' }}
-          <ng-container *ngIf="!correct">The correct answer is {{ song.game }}.</ng-container>
+          <ng-container *ngIf="!correct && !!song">The correct answer is {{ song.game }}.</ng-container>
         </p>
         <div *ngIf="correct">
           <p>You clicked to answer in {{ differenceInSeconds(timestamps.guessStartAt) }} and submitted your guess in {{ differenceInSeconds(timestamps.guessEndAt) }}.</p>
