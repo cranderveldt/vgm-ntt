@@ -1,12 +1,52 @@
 <nb-card *ngIf="room$ | async as room">
-  <nb-card-body>
+  <nb-card-body *ngIf="player$ | async as me">
     <h3>{{ room.name }}</h3>
+
+    <div [ngSwitch]="status">
+      <ng-container *ngSwitchCase="'waiting'">
+        <h4>Waiting for next round</h4>
+        <button nbButton (click)="readyUp()" [disabled]="me.ready">{{ me.ready ? 'Ready!' : 'Ready Up' }}</button>
+        <button nbButton (click)="resong()">Resong</button>
+      </ng-container>
+      <ng-container *ngSwitchCase="'countdown'">
+        <h4>Next round starts in {{ countdown }} seconds...</h4>
+      </ng-container>
+      <ng-container *ngSwitchCase="'listening'">
+        <button nbButton (click)="enterGuess()" size="giant" status="success">I know this game!</button>
+      </ng-container>
+      <ng-container *ngSwitchCase="'guessing'">
+        <form [formGroup]="gameForm" (ngSubmit)="submitGuess(gameForm.value)">
+          <div class="flex-row-mobile flex-gutters-8 bm-8">
+            <div class="flex-col bm-8">
+              <input type="text" formControlName="name" nbInput placeholder="Name">
+            </div>
+            <div class="flex-col bm-8">
+              <button nbButton type="submit" status="success">Send Guess</button>
+            </div>
+          </div>
+        </form>
+      </ng-container>
+      <ng-container *ngSwitchCase="'busy'">
+        <h4>Please wait while the other players finish the current round</h4>
+        <button nbButton (click)="reset()">Reset</button>
+      </ng-container>
+      <ng-container *ngSwitchDefault>
+      </ng-container>
+    </div>
+
+    <div *ngIf="song$ | async as song">
+      <youtube-player
+        [videoId]="song.src"
+        (ready)="savePlayer($event)"
+      ></youtube-player>
+    </div>
     
     <h6>Players</h6>
     <nb-list class="bm-32">
       <nb-list-item *ngFor="let player of room.players$ | async">
         <div class="flex-row-all flex-gutters-8">
           <div class="flex-col">
+            <nb-icon icon="checkmark" *ngIf="player.ready"></nb-icon>
             {{ player.name }}
           </div>
           <div class="flex-col">
