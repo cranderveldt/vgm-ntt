@@ -6,7 +6,6 @@
       <ng-container *ngSwitchCase="'waiting'">
         <h4>Waiting for next round</h4>
         <button nbButton (click)="readyUp()" [disabled]="me.ready">{{ me.ready ? 'Ready!' : 'Ready Up' }}</button>
-        <button nbButton (click)="resong()">Resong</button>
       </ng-container>
       <ng-container *ngSwitchCase="'countdown'">
         <h4>Next round starts in {{ countdown }} seconds...</h4>
@@ -34,13 +33,24 @@
       </ng-container>
       <ng-container *ngSwitchCase="'complete'">
         <h4>Round Complete!</h4>
-        <p>You guessed {{ guess }}, which is {{ correct ? 'correct!' : 'incorrect.' }}</p>
+        <p>
+          You guessed {{ guess }}, which is {{ correct ? 'correct!' : 'incorrect.' }}
+          <ng-container *ngIf="!correct">The correct answer is {{ song.game }}.</ng-container>
+        </p>
         <div *ngIf="correct">
           <p>You clicked to answer in {{ differenceInSeconds(timestamps.guessStartAt) }} and submitted your guess in {{ differenceInSeconds(timestamps.guessEndAt) }}.</p>
         </div>
+
         <div *ngIf="winner">
           <p>You guessed the song correctly the fastest! That's one point for you, congratulations!</p>
         </div>
+
+        <div *ngFor="let player of winner$ | async">
+          {{ player.name }} clicked to answer in {{ msToSeconds(player.start) }} and guessed the game correctly in {{ msToSeconds(player.end) }}!
+        </div>
+
+        <h4>Click when you're ready for the next round</h4>
+        <button nbButton (click)="readyUp()" [disabled]="me.ready">{{ me.ready ? 'Ready!' : 'Ready Up' }}</button>
       </ng-container>
       <ng-container *ngSwitchCase="'busy'">
         <h4>Please wait while the other players finish the current round</h4>
@@ -50,7 +60,7 @@
       </ng-container>
     </div>
 
-    <div *ngIf="song$ | async as song">
+    <div *ngIf="song">
       <youtube-player
         [videoId]="song.src"
         (ready)="saveVideo($event)"
@@ -67,6 +77,9 @@
           </div>
           <div class="flex-col">
             {{ player.score }}
+          </div>
+          <div class="flex-col" *ngIf="player.winner">
+            Won the last round!
           </div>
         </div>
       </nb-list-item>

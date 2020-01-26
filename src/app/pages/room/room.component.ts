@@ -8,6 +8,7 @@ import { NbDialogService } from '@nebular/theme';
 import { JoinRoomComponent } from 'src/app/common/join-room/join-room.component';
 import { RandomNameService } from 'src/app/services/random-name.service';
 import { FormGroup, FormBuilder } from '@angular/forms';
+import { firestore } from 'firebase';
 
 @Component({
   selector: 'app-room',
@@ -17,9 +18,12 @@ import { FormGroup, FormBuilder } from '@angular/forms';
 export class RoomComponent {
   room$: Observable<any>
   player$: Observable<any>
-  song$: Observable<any>
+  song: any
+  songs: any[]
   allReady$: Observable<any>
   allDone$: Observable<any>
+  winner$: Observable<any>
+  playerScores$: Observable<any>
   playerRef: AngularFirestoreDocument
   roomRef: AngularFirestoreDocument
   userId: string
@@ -29,7 +33,6 @@ export class RoomComponent {
   guess: string
   countdown = 0
   gameForm: FormGroup
-  song: any
   timestamps = {
     guessStartAt: null,
     guessEndAt: null,
@@ -49,7 +52,7 @@ export class RoomComponent {
     private formBuilder: FormBuilder,
   ) {
     this.gameForm = this.formBuilder.group({ name: '' })
-    this.song$ = this.nextSong()
+    this.loadSongs()
     this.room$ = this.route.paramMap.pipe(
       switchMap((params: ParamMap) => {
         this.roomId = params.get('id')
@@ -65,6 +68,13 @@ export class RoomComponent {
         this.allDone$ = this.roomRef.collection('players').valueChanges().pipe(
           filter(players => players.reduce((acc, x) => x.done && acc, true)),
           take(1)
+        )
+        this.playerScores$ = this.roomRef.collection('players').valueChanges({ idField: 'id' }).pipe(
+          filter(players => players.reduce((acc, player) => acc && typeof player.correct === 'boolean', true)),
+          take(1)
+        )
+        this.winner$ = this.roomRef.collection('players').valueChanges({ idField: 'id' }).pipe(
+          map(players => players.filter((player) => player.winner && player.id !== this.userId)),
         )
         this.roomRef.collection('players').get().pipe(map(snapshot => {
           return snapshot.docs.reduce((acc, x) => x.data().ready && acc, true)
@@ -101,7 +111,8 @@ export class RoomComponent {
   }
 
   readyUp() {
-    this.playerRef.update({ ready: true })
+    this.song = null
+    this.playerRef.update({ ready: true, done: false, correct: null })
     this.timestamps.readyAt = Date.now()
     this.allReady$.subscribe(() => this.allReady())
   }
@@ -110,6 +121,7 @@ export class RoomComponent {
     this.timestamps.allReadyAt = Date.now()
     this.status = 'countdown'
     this.countdown = 5
+    this.song = this.songs.pop()
     const interval = setInterval(() => {
       this.countdown--
       if (this.countdown <= 0) {
@@ -119,37 +131,18 @@ export class RoomComponent {
     }, 1000)
   }
 
-  // AVOID DUPLICATES, use a playlist set by the room
-  nextSong() {
-    const random = this.randomName.randomId(20)
-    const lowQuery = this.db.collection('songs', ref => {
-      return ref.where('__name__', '>=', '0').orderBy('__name__').limit(1)
-    }).valueChanges()
-    const highQuery = this.db.collection('songs', ref => {
-      return ref.where('__name__', '>=', random).orderBy('__name__').limit(1)
-    }).valueChanges()
-
-    return highQuery.pipe(
-      switchMap(songs => {
-        if (songs.length === 0) {
-          return lowQuery
-        }
-        return of(songs)
-      }),
-      map(songs => songs[0])
-    )
+  loadSongs() {
+    this.db.collection('songs').get().subscribe(snapshot => {
+      this.songs = this.randomName.shuffleArray(snapshot.docs).map(x => x.data())
+    })
   }
 
   saveVideo(video: any) {
     this.video = video
   }
 
-  resong() {
-    this.song$ = this.nextSong()
-  }
-
   reset() {
-    this.playerRef.update({ ready: false })
+    this.playerRef.update({ ready: false, done: false, winner: false, correct: null })
     this.status = 'waiting'
   }
 
@@ -181,6 +174,7 @@ export class RoomComponent {
     this.status = 'guessed'
     this.guess = data.name
     this.timestamps.guessEndAt = Date.now()
+    this.gameForm.reset()
     this.playerRef.update({ done: true })
   }
 
@@ -188,22 +182,47 @@ export class RoomComponent {
     this.status = 'complete'
     this.countdown = 0
     this.video.stopVideo()
-    // this.correct = this.song.game === this.guess
-    this.correct = "Cool" === this.guess
+    this.correct = this.song.game === this.guess
+    this.playerScores$.subscribe(players => this.showScores(players))
+    setTimeout(() => {
+      // TODO: Better comparative logic here so we can use regex or something
+      if (this.correct) {
+        this.playerRef.update({
+          winner: false,
+          correct: true,
+          start: this.timestamps.guessStartAt - (this.timestamps.allReadyAt + 5000),
+          end: this.timestamps.guessEndAt - (this.timestamps.allReadyAt + 5000),
+        })
+      } else {
+        this.playerRef.update({ correct: false, winner: false })
+      }
+    }, 2000)
+  }
 
-    // TODO: Better comparative logic here so we can use regex or something
-    if (this.correct) {
-      this.playerRef.update({
-        correct: true,
-        start: this.timestamps.guessStartAt - (this.timestamps.allReadyAt + 5000),
-        end: this.timestamps.guessEndAt - (this.timestamps.allReadyAt + 5000),
-      })
-    }
+  msToSeconds(ms: number) {
+    const tenths = Math.floor(ms / 100)
+    return `${Math.floor(tenths / 10)}.${tenths % 10} seconds`
   }
 
   differenceInSeconds(stamp) {
     const tenths = Math.floor((stamp - (this.timestamps.allReadyAt + 5000)) / 100)
     return `${Math.floor(tenths / 10)}.${tenths % 10} seconds`
+  }
+
+  showScores(players) {
+    // this.status = 'complete'
+    const winners = players.filter(x => x.correct).sort((a, b) => a.start - b.start)
+    let winner = winners[0]
+    if (winners.length > 1) {
+      const fastWinners = winners.filter(x => Math.abs(x.start - winner.start) < 1000).sort((a, b) => a.end - b.end)
+      winner = fastWinners[0]
+    }
+
+    this.winner = winner && winner.id === this.userId
+    if (this.winner) {
+      this.playerRef.update({ winner: true, score: firestore.FieldValue.increment(1), ready: false })
+    }
+
   }
 
 }

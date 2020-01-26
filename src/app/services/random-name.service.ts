@@ -30,6 +30,16 @@ export class RandomNameService {
     return array
   }
 
+  shuffleArray(array: any[]): any[] {
+    this.sizedArray(array.length).forEach((x, i) => {
+      const j = Math.floor(Math.random() * i)
+      const temp = array[i]
+      array[i] = array[j]
+      array[j] = temp
+    })
+    return array
+  }
+
   isEmpty(value: any): boolean {
     return value === '' || value === null || value === undefined
   }
