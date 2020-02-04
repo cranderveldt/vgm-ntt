@@ -6,7 +6,6 @@ import { Observable, of } from 'rxjs';
 import { CookieService } from 'ngx-cookie-service';
 import { NbDialogService } from '@nebular/theme';
 import { JoinRoomComponent } from 'src/app/common/join-room/join-room.component';
-import { FakerService } from 'src/app/services/faker.service';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { firestore } from 'firebase';
 
@@ -42,6 +41,7 @@ export class RoomComponent {
   }
   correct: boolean
   winner: boolean
+  lastSong: string
 
   constructor(
     private db: AngularFirestore,
@@ -49,7 +49,6 @@ export class RoomComponent {
     private cookie: CookieService,
     private dialog: NbDialogService,
     private router: Router,
-    private faker: FakerService,
     private formBuilder: FormBuilder,
   ) {
     this.loadRoom()
@@ -167,7 +166,10 @@ export class RoomComponent {
   }
 
   beginRound() {
+    this.lastSong = this.song.game
     this.status = 'listening'
+    this.video.setVolume(100)
+    this.video.seekTo(0)
     this.video.playVideo()
 
     this.countdown = 30
@@ -204,7 +206,7 @@ export class RoomComponent {
     this.status = 'complete'
     this.countdown = 0
     this.video.stopVideo()
-    this.correct = this.song.game === this.guess
+    this.correct = !!this.guess && !!this.guess.match(new RegExp(this.song.regex, 'gi'))
     this.playerScores$.subscribe(players => this.showScores(players))
     setTimeout(() => {
       // TODO: Better comparative logic here so we can use regex or something
@@ -246,9 +248,13 @@ export class RoomComponent {
       this.playerRef.update({ ready: false })
     }
 
+    // In this block here, every client writes the same list to the same position
+    // ideally only client would be in charge of this
+    // TODO: Songs are getting picked up in the wrong order??
     this.song = null
     this.songs.shift()
     this.roomRef.update({ songs: this.songs })
+
     // TODO: fix the song replacement thing so the text on screen that says
     // "the correct answer was song.game" isn't changed
     this.db.doc(`songs/${this.songs[0]}`).get().subscribe(snapshot => this.song = snapshot.data())
