@@ -19,6 +19,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { RoomComponent } from './pages/room/room.component';
 import { CookieService } from 'ngx-cookie-service';
 import { JoinRoomComponent } from './common/join-room/join-room.component';
+import { AddRoomComponent } from './common/add-room/add-room.component';
 
 @NgModule({
   declarations: [
@@ -27,7 +28,8 @@ import { JoinRoomComponent } from './common/join-room/join-room.component';
     RoomsComponent,
     AddSongComponent,
     RoomComponent,
-    JoinRoomComponent
+    JoinRoomComponent,
+    AddRoomComponent
   ],
   imports: [
     BrowserModule,
@@ -55,6 +57,7 @@ import { JoinRoomComponent } from './common/join-room/join-room.component';
   schemas: [ CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA ],
   entryComponents: [
     JoinRoomComponent,
+    AddRoomComponent,
   ]
 })
 export class AppModule { }

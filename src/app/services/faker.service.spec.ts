@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 
-import { RandomNameService } from './random-name.service';
+import { FakerService } from './faker.service';
 
-describe('RandomNameService', () => {
+describe('FakerService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));
 
   it('should be created', () => {
-    const service: RandomNameService = TestBed.get(RandomNameService);
+    const service: FakerService = TestBed.get(FakerService);
     expect(service).toBeTruthy();
   });
 });

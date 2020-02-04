@@ -10,7 +10,7 @@ interface Phoneme {
   providedIn: 'root'
 })
 
-export class RandomNameService {
+export class FakerService {
 
   constructor() { }
 

@@ -1,0 +1,16 @@
+<nb-card>
+  <nb-card-header>Create Room</nb-card-header>
+  <nb-card-body>
+    <form [formGroup]="gameForm" class="bm-64" (ngSubmit)="addRoom(gameForm.value)">
+      <div class="bm-16">
+        <input type="text" formControlName="name" nbInput placeholder="Name">
+      </div>
+      <div>
+        <button nbButton type="submit">Create Room</button>
+      </div>
+    </form>
+  </nb-card-body>
+  <nb-card-footer>
+    <button nbButton (click)="close()" status="basic">Cancel</button>
+  </nb-card-footer>
+</nb-card>

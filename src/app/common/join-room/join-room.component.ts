@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { NbDialogRef } from '@nebular/theme';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { RandomNameService } from 'src/app/services/random-name.service';
+import { FakerService } from 'src/app/services/faker.service';
 
 @Component({
   selector: 'app-join-room',
@@ -16,17 +16,17 @@ export class JoinRoomComponent {
   constructor(
     protected dialogRef: NbDialogRef<any>,
     private formBuilder: FormBuilder,
-    private randomName: RandomNameService,
+    private faker: FakerService,
   ) {
     this.gameForm = this.formBuilder.group({
-      name: this.randomName.randomName(),
+      name: this.faker.randomName(),
       score: 0,
       ready: false,
     })
   }
 
   rename() {
-    this.gameForm.patchValue({ name: this.randomName.randomName() })
+    this.gameForm.patchValue({ name: this.faker.randomName() })
   }
 
   close() {

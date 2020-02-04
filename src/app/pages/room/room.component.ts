@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild, ElementRef } from '@angular/core';
 import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore';
 import { switchMap, take, map, filter } from 'rxjs/operators';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
@@ -6,7 +6,7 @@ import { Observable, of } from 'rxjs';
 import { CookieService } from 'ngx-cookie-service';
 import { NbDialogService } from '@nebular/theme';
 import { JoinRoomComponent } from 'src/app/common/join-room/join-room.component';
-import { RandomNameService } from 'src/app/services/random-name.service';
+import { FakerService } from 'src/app/services/faker.service';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { firestore } from 'firebase';
 
@@ -16,6 +16,7 @@ import { firestore } from 'firebase';
   styleUrls: ['./room.component.scss']
 })
 export class RoomComponent {
+  // @ViewChild('nameField', { read: true, static: false }) nameField: ElementRef
   room$: Observable<any>
   player$: Observable<any>
   song: any
@@ -48,49 +49,66 @@ export class RoomComponent {
     private cookie: CookieService,
     private dialog: NbDialogService,
     private router: Router,
-    private randomName: RandomNameService,
+    private faker: FakerService,
     private formBuilder: FormBuilder,
   ) {
+    this.loadRoom()
+  }
+
+  async loadRoom() {
     this.gameForm = this.formBuilder.group({ name: '' })
-    this.loadSongs()
-    this.room$ = this.route.paramMap.pipe(
-      switchMap((params: ParamMap) => {
-        this.roomId = params.get('id')
-        this.userId = this.cookie.get(`${this.roomId}/playerId`)
-        this.loadUser()
-        this.roomRef = this.db.doc(`rooms/${this.roomId}`)
-        this.playerRef = this.db.doc(`rooms/${this.roomId}/players/${this.userId}`)
-        this.player$ = this.playerRef.valueChanges()
-        this.allReady$ = this.roomRef.collection('players').valueChanges().pipe(
-          filter(players => players.reduce((acc, x) => x.ready && acc, true)),
-          take(1)
-        )
-        this.allDone$ = this.roomRef.collection('players').valueChanges().pipe(
-          filter(players => players.reduce((acc, x) => x.done && acc, true)),
-          take(1)
-        )
-        this.playerScores$ = this.roomRef.collection('players').valueChanges({ idField: 'id' }).pipe(
-          filter(players => players.reduce((acc, player) => acc && typeof player.correct === 'boolean', true)),
-          take(1)
-        )
-        this.winner$ = this.roomRef.collection('players').valueChanges({ idField: 'id' }).pipe(
-          map(players => players.filter((player) => player.winner && player.id !== this.userId)),
-        )
-        this.roomRef.collection('players').get().pipe(map(snapshot => {
-          return snapshot.docs.reduce((acc, x) => x.data().ready && acc, true)
-        })).subscribe(allReady => this.status = allReady ? 'busy' : 'waiting')
-        return this.roomRef.valueChanges().pipe(switchMap(room => of({
-            ...room,
-            players$: this.roomRef.collection('players').valueChanges()
-          })
-        ))
-      })
+    this.route.paramMap.pipe(take(1)).subscribe((params: ParamMap) => {
+      this.roomId = params.get('id')
+      this.userId = this.cookie.get(`${this.roomId}/playerId`)
+      this.roomRef = this.db.doc(`rooms/${this.roomId}`)
+      this.loadUser()
+    })
+  }
+
+  loadUserRoom() {
+    this.playerRef = this.db.doc(`rooms/${this.roomId}/players/${this.userId}`)
+    this.player$ = this.playerRef.valueChanges()
+    this.allReady$ = this.roomRef.collection('players').valueChanges().pipe(
+      filter(players => players.reduce((acc, x) => x.ready && acc, true)),
+      take(1)
     )
+    this.allDone$ = this.roomRef.collection('players').valueChanges().pipe(
+      filter(players => players.filter(x => x.ready).reduce((acc, x) => x.done && acc, true)),
+      take(1)
+    )
+    this.playerScores$ = this.roomRef.collection('players').valueChanges({ idField: 'id' }).pipe(
+      filter(players => players.filter(x => x.ready).reduce((acc, player) => acc && typeof player.correct === 'boolean', true)),
+      take(1)
+    )
+    this.winner$ = this.roomRef.collection('players').valueChanges({ idField: 'id' }).pipe(
+      map(players => players.filter((player) => player.ready && player.winner && player.id !== this.userId)),
+    )
+
+    // Initialize the status
+    this.roomRef.collection('players').get().pipe(map(snapshot => {
+      return snapshot.docs.reduce((acc, x) => x.data().ready && acc, true)
+    })).subscribe(allReady => {
+      this.status = allReady ? 'busy' : 'waiting'
+      if (allReady) {
+        this.playerRef.update({ ready: false, done: false, winner: false, correct: null })
+        // todo: watch for the next round to start here, when it does change status to waiting
+      }
+    })
+
+    this.room$ = this.roomRef.valueChanges().pipe(switchMap(room => of({
+      ...room,
+      players$: this.roomRef.collection('players').valueChanges()
+    })))
+    this.loadSongs()
   }
 
   loadUser() {
+    // TODO: what happens if you have a cookie but the room
+    // doesn't have a user for that cookie ID?
     if (!this.userId) {
       this.newUser()
+    } else {
+      this.loadUserRoom()
     }
   }
 
@@ -104,6 +122,7 @@ export class RoomComponent {
         const userData = await this.roomRef.collection('players').add(data)
         this.userId = userData.id
         this.cookie.set(`${this.roomId}/playerId`, this.userId)
+        this.loadUserRoom()
       } else {
         this.router.navigate(['/rooms'])
       }
@@ -111,7 +130,6 @@ export class RoomComponent {
   }
 
   readyUp() {
-    this.song = null
     this.playerRef.update({ ready: true, done: false, correct: null })
     this.timestamps.readyAt = Date.now()
     this.allReady$.subscribe(() => this.allReady())
@@ -121,7 +139,6 @@ export class RoomComponent {
     this.timestamps.allReadyAt = Date.now()
     this.status = 'countdown'
     this.countdown = 5
-    this.song = this.songs.pop()
     const interval = setInterval(() => {
       this.countdown--
       if (this.countdown <= 0) {
@@ -132,8 +149,11 @@ export class RoomComponent {
   }
 
   loadSongs() {
-    this.db.collection('songs').get().subscribe(snapshot => {
-      this.songs = this.randomName.shuffleArray(snapshot.docs).map(x => x.data())
+    this.room$.pipe(switchMap(room => {
+      this.songs = room.songs
+      return this.db.doc(`songs/${room.songs[0]}`).get()
+    })).subscribe(snapshot => {
+      this.song = snapshot.data()
     })
   }
 
@@ -168,6 +188,8 @@ export class RoomComponent {
   enterGuess() {
     this.status = 'guessing'
     this.timestamps.guessStartAt = Date.now()
+    // Autofocus NOT WORKING
+    // setTimeout(() => this.nameField.nativeElement.focus(), 300)
   }
 
   submitGuess(data) {
@@ -210,7 +232,6 @@ export class RoomComponent {
   }
 
   showScores(players) {
-    // this.status = 'complete'
     const winners = players.filter(x => x.correct).sort((a, b) => a.start - b.start)
     let winner = winners[0]
     if (winners.length > 1) {
@@ -225,6 +246,11 @@ export class RoomComponent {
       this.playerRef.update({ ready: false })
     }
 
+    this.song = null
+    this.songs.shift()
+    this.roomRef.update({ songs: this.songs })
+    // TODO: fix the song replacement thing so the text on screen that says
+    // "the correct answer was song.game" isn't changed
+    this.db.doc(`songs/${this.songs[0]}`).get().subscribe(snapshot => this.song = snapshot.data())
   }
-
 }

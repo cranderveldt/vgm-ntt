@@ -1,7 +1,6 @@
 <nb-card>
   <nb-card-body>
     <h3>Rooms</h3>
-    
     <nb-list class="bm-32">
       <nb-list-item *ngFor="let room of rooms$ | async">
         <div class="flex-row-all flex-justify-spaced flex-align-center">
@@ -14,6 +13,6 @@
         </div>
       </nb-list-item>
     </nb-list>
-    <button nbButton>Add Room</button>
+    <button nbButton (click)="addRoom()">Add Room</button>
   </nb-card-body>
 </nb-card>
