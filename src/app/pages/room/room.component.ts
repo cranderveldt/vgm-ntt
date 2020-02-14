@@ -2,7 +2,7 @@ import { Component, ViewChild, ElementRef } from '@angular/core';
 import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore';
 import { switchMap, take, map, filter } from 'rxjs/operators';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { Observable, of } from 'rxjs';
+import { Observable, of, Subscription } from 'rxjs';
 import { CookieService } from 'ngx-cookie-service';
 import { NbDialogService } from '@nebular/theme';
 import { JoinRoomComponent } from 'src/app/common/join-room/join-room.component';
@@ -22,6 +22,7 @@ export class RoomComponent {
   songs: any[]
   allReady$: Observable<any>
   allDone$: Observable<any>
+  allDoneSubscription: Subscription
   winner$: Observable<any>
   playerScores$: Observable<any>
   playerRef: AngularFirestoreDocument
@@ -176,12 +177,13 @@ export class RoomComponent {
     const interval = setInterval(() => {
       this.countdown--
       if (this.countdown <= 0) {
+        this.allDoneSubscription.unsubscribe()
         this.roundComplete()
         clearInterval(interval)
       }
     }, 1000)
 
-    this.allDone$.subscribe(() => {
+    this.allDoneSubscription = this.allDone$.subscribe(() => {
       this.roundComplete()
       clearInterval(interval)
     })

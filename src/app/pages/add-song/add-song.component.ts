@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { AngularFirestore } from '@angular/fire/firestore';
-import { HttpService } from 'src/app/services/http.service';
+// import { HttpService } from 'src/app/services/http.service';
 
 @Component({
   selector: 'app-add-song',
@@ -16,12 +16,12 @@ export class AddSongComponent implements OnInit {
   constructor(
     private db: AngularFirestore,
     private formBuilder: FormBuilder,
-    private http: HttpService,
+    // private http: HttpService,
   ) {
     this.songs$ = this.db.collection('songs').valueChanges()
     this.songForm = this.formBuilder.group({
       game: '',
-      platform: '',
+      regex: '',
       src: '',
     })
     // this.games$ = this.http.post('https://api-v3.igdb.com/headers', {
@@ -39,7 +39,6 @@ export class AddSongComponent implements OnInit {
   }
 
   addSong(songData) {
-    console.log(songData)
     this.db.collection('songs').add(songData)
     this.songForm.reset()
   }
