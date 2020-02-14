@@ -42,9 +42,4 @@ export class AddSongComponent implements OnInit {
     this.db.collection('songs').add(songData)
     this.songForm.reset()
   }
-
-  platform(song) {
-    return song.platform.split(',').join(', ')
-  }
-
 }

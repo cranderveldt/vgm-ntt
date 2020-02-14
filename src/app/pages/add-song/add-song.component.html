@@ -21,7 +21,7 @@
     <h2>All added songs</h2>
     <nb-list>
       <nb-list-item *ngFor="let song of songs$ | async">
-        {{ song.game }} for {{ platform(song) }}
+        {{ song.game }}
       </nb-list-item>
     </nb-list>
 
